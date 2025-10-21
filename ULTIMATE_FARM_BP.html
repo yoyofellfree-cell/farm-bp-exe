@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>УЛЬТИМАТИВНЫЙ ФАРМ BP</title>
+<style>
+  :root{
+    --easy-bg: #e9f7ef;
+    --easy-border: #b7e0c9;
+    --medium-bg: #fff9e6;
+    --medium-border: #f1e0a8;
+    --joint-bg: #eef5ff;
+    --joint-border: #c6dbff;
+    --avoid-bg: #f5f5f5;
+    --avoid-border: #dddddd;
+  }
+  body { font-family: system-ui, -apple-system, Roboto, Arial, sans-serif; padding: 18px; color:#222; background:#fff; }
+  h1 { margin: 0 0 8px 0; font-size:1.4rem; }
+  .controls { margin-bottom:12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+  button { padding:8px 12px; border-radius:8px; border:1px solid #bbb; background:#fafafa; cursor:pointer; }
+  .tog { display:flex; gap:8px; align-items:center; }
+  .small { font-size:0.9rem; color:#555; }
+  .legend { margin:8px 0 14px 0; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .legend .item { display:flex; gap:6px; align-items:center; font-size:0.9rem; color:#333; }
+  .chip { width:14px; height:14px; border-radius:4px; display:inline-block; border:1px solid rgba(0,0,0,0.06); }
+  table { border-collapse: collapse; width: 100%; max-width: 1100px; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
+  th { background: #f7f7f7; position: sticky; top:0; z-index:1; }
+  tr.easy { background: var(--easy-bg); border-left:4px solid var(--easy-border); }
+  tr.medium { background: var(--medium-bg); border-left:4px solid var(--medium-border); }
+  tr.joint { background: var(--joint-bg); border-left:4px solid var(--joint-border); }
+  tr.avoid { background: var(--avoid-bg); border-left:4px solid var(--avoid-border); opacity:0.6; font-size:0.95rem; color:#555; }
+  td.reward { white-space:nowrap; font-weight:700; }
+  body.vip-mode td.reward { box-shadow: inset 0 0 0 2px rgba(212,175,55,0.12); border-radius:6px; }
+  body.x2-mode td.reward { box-shadow: inset 0 0 0 2px rgba(74,163,255,0.12); border-radius:6px; }
+  body.vip-mode.x2-mode td.reward { box-shadow: inset 0 0 0 2px rgba(0,0,0,0.06), 0 0 10px rgba(74,163,255,0.08); background: linear-gradient(90deg, rgba(212,175,55,0.06), rgba(74,163,255,0.04)); }
+  .total { margin: 12px 0; font-weight:700; font-size:1.05rem; display:flex; justify-content:space-between; align-items:center; max-width:1100px; gap:12px; }
+  .separate { margin-top:14px; padding:10px; border:1px dashed #e0e0e0; border-radius:8px; max-width:1100px; background:#fafafa; color:#333; }
+  .no-bp { display:flex; gap:8px; align-items:center; }
+  footer { margin-top:14px; font-size:0.95rem; color:#333; max-width:1100px; }
+  footer a { color:#0b66c3; text-decoration:none; }
+</style>
+</head>
+<body>
+<h1>УЛЬТИМАТИВНЫЙ ФАРМ BP</h1>
+
+<div class="controls">
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button id="resetBtn">Сбросить</button>
+  </div>
+  <label class="tog"><input type="checkbox" id="vipCheckbox"> <span class="small">Есть Platinum VIP</span></label>
+  <label class="tog"><input type="checkbox" id="x2Checkbox"> <span class="small">Акции x2</span></label>
+</div>
+
+<div class="legend">
+  <div class="item"><span class="chip" style="background:var(--easy-bg);border:1px solid var(--easy-border)"></span> Легкие</div>
+  <div class="item"><span class="chip" style="background:var(--medium-bg);border:1px solid var(--medium-border)"></span> Средние</div>
+  <div class="item"><span class="chip" style="background:var(--joint-bg);border:1px solid var(--joint-border)"></span> Совместные</div>
+  <div class="item"><span class="chip" style="background:var(--avoid-bg);border:1px solid var(--avoid-border)"></span> Не хочется</div>
+</div>
+
+<div class="total">
+  <div class="left">Итого: <span id="totalDisplay">0 BP</span></div>
+  <div class="right">Осталось: <span id="remainingDisplay">0</span> BP</div>
+</div>
+
+<table id="tasksTable" aria-label="Список заданий">
+<thead>
+<tr><th>Задание</th><th>Выполнено (сегодня)</th><th>Награда</th></tr>
+</thead>
+<tbody>
+<!-- Легкие -->
+<tr class="easy"><td>Купить лотерейный билет</td><td><input type="checkbox" id="cb0"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Посетить любой сайт в браузере</td><td><input type="checkbox" id="cb1"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Поставить лайк любой анкете в Match</td><td><input type="checkbox" id="cb2"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Зайти в любой канал в Brawl</td><td><input type="checkbox" id="cb3"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Добавить 5 видео в кинотеатре</td><td><input type="checkbox" id="cb4"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Арендовать киностудию</td><td><input type="checkbox" id="cb5"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="easy"><td>Забить 2 гола в футболе</td><td><input type="checkbox" id="cb6"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Починить деталь в автосервисе</td><td><input type="checkbox" id="cb7"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Успешная тренировка в тире</td><td><input type="checkbox" id="cb8"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Поиграть 1 минуту в настольный теннис</td><td><input type="checkbox" id="cb9"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>10 действий на ферме</td><td><input type="checkbox" id="cb10"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+
+<tr class="easy"><td>Нули в казино</td><td><input type="checkbox" id="cb11"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="easy"><td>Ставка межсерверное колесо</td><td><input type="checkbox" id="cb12"></td><td class="reward" data-without="3" data-with="6">3 BP</td></tr>
+<tr class="easy"><td>Забросить 2 мяча в баскетболе</td><td><input type="checkbox" id="cb13"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Поиграть 1 минуту в большой теннис</td><td><input type="checkbox" id="cb14"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Победить в дартс</td><td><input type="checkbox" id="cb15"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="easy"><td>Забить 10 голов в волейболе</td><td><input type="checkbox" id="cb16"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+
+<!-- Средние -->
+<tr class="medium"><td>25 действий на стройке</td><td><input type="checkbox" id="cb17"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="medium"><td>25 действий в порту</td><td><input type="checkbox" id="cb18"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="medium"><td>25 действий в шахте</td><td><input type="checkbox" id="cb19"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+
+<tr class="medium"><td>Победить в армрестлинге</td><td><input type="checkbox" id="cb20"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="medium"><td>2 круга на любом маршруте автобусника</td><td><input type="checkbox" id="cb21"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="medium"><td>Выполнить 2 квеста любых клубов</td><td><input type="checkbox" id="cb22"></td><td class="reward" data-without="4" data-with="8">4 BP</td></tr>
+<tr class="medium"><td>Проехать 1 станцию на метро</td><td><input type="checkbox" id="cb23"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="medium"><td>Поймать 20 рыб</td><td><input type="checkbox" id="cb24"></td><td class="reward" data-without="4" data-with="8">4 BP</td></tr>
+<tr class="medium"><td>Кинуть мяч питомцу 15 раз</td><td><input type="checkbox" id="cb25"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="medium"><td>15 выполненных питомцем команд</td><td><input type="checkbox" id="cb26"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="medium"><td>20 подходов в тренажерном зале</td><td><input type="checkbox" id="cb27"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="medium"><td>Выкопать 1 сокровище</td><td><input type="checkbox" id="cb30"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="medium"><td>5 раз снять 100% шкуру с животных</td><td><input type="checkbox" id="cb34"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+
+<!-- Совместные -->
+<tr class="joint"><td>Сыграть в мафию в казино</td><td><input type="checkbox" id="cb_mafia2"></td><td class="reward" data-without="3" data-with="6">3 BP</td></tr>
+<tr class="joint"><td>Выиграть гонку в картинге</td><td><input type="checkbox" id="cb29"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="joint"><td>Проехать 1 уличную гонку (через тлф. ставка от 1000$)</td><td><input type="checkbox" id="cb31"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="joint"><td>Выиграть 5 игр в тренировочном комплексе со ставкой (от 100$)</td><td><input type="checkbox" id="cb32"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="joint"><td>Выиграть 3 любых игры на арене со ставкой (от 100$)</td><td><input type="checkbox" id="cb33"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="joint"><td>3 победы в Дэнс Баттлах</td><td><input type="checkbox" id="cb37"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+
+<!-- Не хочется -->
+<tr class="avoid"><td>10 посылок на почте</td><td><input type="checkbox" id="cb28"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="avoid"><td>Выполнить 15 заказов дальнобойщиком в порт</td><td><input type="checkbox" id="cb35"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+<tr class="avoid"><td>Прокрутить за DP серебрянный или золотой кейс</td><td><input type="checkbox" id="cb36"></td><td class="reward" data-without="10" data-with="20">10 BP</td></tr>
+<tr class="avoid"><td>Заказ материалов для бизнеса вручную (просто прожать вкл/выкл)</td><td><input type="checkbox" id="cb38"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="avoid"><td>Потушить 25 "огоньков" пожарным</td><td><input type="checkbox" id="cb39"></td><td class="reward" data-without="1" data-with="2">1 BP</td></tr>
+<tr class="avoid"><td>Два раза оплатить смену внешности у хирурга в EMS</td><td><input type="checkbox" id="cb40"></td><td class="reward" data-without="2" data-with="4">2 BP</td></tr>
+
+</tbody>
+</table>
+
+<!-- Отдельно: повторяемое задание (информативно, BP не считается в сумме) -->
+<div class="separate">
+  <div class="no-bp"><strong>3 часа в онлайне</strong> — повторяемое задание. Даёт 2 BP без Platinum VIP и 4 BP с Platinum VIP (с учётом акций x2 значения умножаются соответственно). Это информационный блок, задание не учитывается в сумме.</div>
+</div>
+
+<footer>
+  <p>Спасибо автору канала <a href="https://www.youtube.com/@q-d" target="_blank" rel="noopener">Guides by Q-D</a> — искал способы фарма.</p>
+  <p>Привет серверу Rainbow!</p>
+</footer>
+
+<script>
+const storageKey = 'daily_tasks_done_v4';
+const vipStorageKey = 'daily_tasks_vip_mode_v4';
+const x2StorageKey = 'daily_tasks_x2_mode_v4';
+
+const checkboxes = Array.from(document.querySelectorAll('#tasksTable tbody input[type="checkbox"]'));
+const N = checkboxes.length;
+const vipCheckbox = document.getElementById('vipCheckbox');
+const x2Checkbox = document.getElementById('x2Checkbox');
+
+function getPairFromCell(cell) {
+  const without = parseInt(cell.getAttribute('data-without') || '0', 10);
+  const withv = parseInt(cell.getAttribute('data-with') || without.toString(), 10);
+  return {a: without, b: withv};
+}
+
+function updateRewardCellsDisplay(showVip, x2) {
+  const rewardCells = Array.from(document.querySelectorAll('#tasksTable tbody td.reward'));
+  rewardCells.forEach(cell => {
+    const {a,b} = getPairFromCell(cell);
+    const base = showVip ? b : a;
+    const displayVal = base * (x2 ? 2 : 1);
+    cell.textContent = displayVal + ' BP';
+  });
+  document.body.classList.toggle('vip-mode', !!showVip);
+  document.body.classList.toggle('x2-mode', !!x2);
+}
+
+function computeTotals(showVip, x2) {
+  let sumSelected = 0;
+  let possibleTotal = 0;
+  const rows = Array.from(document.querySelectorAll('#tasksTable tbody tr'));
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const rewardCell = row.querySelector('td.reward');
+    if (!rewardCell) continue;
+    const {a,b} = getPairFromCell(rewardCell);
+    const val = (showVip ? b : a) * (x2 ? 2 : 1);
+    const cb = row.querySelector('input[type="checkbox"]');
+    if (cb && cb.checked) sumSelected += val;
+    possibleTotal += val;
+    const taskText = row.querySelector('td:first-child').textContent.trim();
+    if (taskText === 'Два раза оплатить смену внешности у хирурга в EMS') break;
+  }
+  const remaining = Math.max(0, possibleTotal - sumSelected);
+  return {sumSelected, possibleTotal, remaining};
+}
+
+function refreshAll() {
+  const vipMode = !!JSON.parse(localStorage.getItem(vipStorageKey) || 'false');
+  const x2Mode = !!JSON.parse(localStorage.getItem(x2StorageKey) || 'false');
+  vipCheckbox.checked = vipMode;
+  x2Checkbox.checked = x2Mode;
+  updateRewardCellsDisplay(vipMode, x2Mode);
+  const totals = computeTotals(vipMode, x2Mode);
+  document.getElementById('totalDisplay').textContent = totals.sumSelected + ' BP';
+  document.getElementById('remainingDisplay').textContent = totals.remaining;
+}
+
+function loadState() {
+  const raw = localStorage.getItem(storageKey);
+  let arr = null;
+  try { arr = JSON.parse(raw); } catch(e){ arr = null; }
+  if(!Array.isArray(arr) || arr.length !== N) arr = new Array(N).fill(false);
+  for(let i=0;i<N;i++){
+    const cb = checkboxes[i];
+    if (cb) cb.checked = !!arr[i];
+  }
+  const vipMode = !!JSON.parse(localStorage.getItem(vipStorageKey) || 'false');
+  const x2Mode = !!JSON.parse(localStorage.getItem(x2StorageKey) || 'false');
+  vipCheckbox.checked = vipMode;
+  x2Checkbox.checked = x2Mode;
+  refreshAll();
+}
+
+function saveState() {
+  const arr = checkboxes.map(cb => !!cb.checked);
+  localStorage.setItem(storageKey, JSON.stringify(arr));
+  refreshAll();
+}
+
+checkboxes.forEach(cb => cb.addEventListener('change', saveState));
+vipCheckbox.addEventListener('change', ()=>{
+  localStorage.setItem(vipStorageKey, JSON.stringify(!!vipCheckbox.checked));
+  refreshAll();
+});
+x2Checkbox.addEventListener('change', ()=>{
+  localStorage.setItem(x2StorageKey, JSON.stringify(!!x2Checkbox.checked));
+  refreshAll();
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  checkboxes.forEach(cb => cb.checked = false);
+  saveState();
+});
+
+loadState();
+</script>
+</body>
+</html>
